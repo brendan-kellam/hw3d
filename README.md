@@ -1,4 +1,4 @@
-# hw3d
+# Saturn
 
 A little DirectX11 3D learner game engine. Getting started with two awesome tutorial series:
 - [ChiliTomatoNoodle's](https://www.youtube.com/user/ChiliTomatoNoodle) Hardware 3D series. [link](https://www.youtube.com/watch?v=_4FArgOX1I4&list=PLqCJpWy5Fohd3S7ICFXwUomYW0Wv67pDD)
