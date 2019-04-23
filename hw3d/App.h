@@ -11,8 +11,10 @@ public:
 	~App();
 private:
 	void DoFrame();
+	void HandleInput(float dt);
 private:
 	Window wnd;
 	ChiliTimer timer;
 	std::vector<std::unique_ptr<class Box>> boxes;
+
 };

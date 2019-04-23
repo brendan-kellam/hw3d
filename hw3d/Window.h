@@ -26,7 +26,6 @@
 #include <optional>
 #include <memory>
 
-
 class Window
 {
 public:
@@ -77,6 +76,10 @@ public:
 	void SetTitle( const std::string& title );
 	static std::optional<int> ProcessMessages() noexcept;
 	Graphics& Gfx();
+
+	inline int GetWidth() const  { return width; }
+	inline int GetHeight() const { return height; }
+
 private:
 	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept;

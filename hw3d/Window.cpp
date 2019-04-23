@@ -99,7 +99,7 @@ Window::Window( int width,int height,const char* name )
 	// newly created windows start off as hidden
 	ShowWindow( hWnd,SW_SHOWDEFAULT );
 	// create graphics object
-	pGfx = std::make_unique<Graphics>( hWnd );
+	pGfx = std::make_unique<Graphics>( hWnd, width, height );
 }
 
 Window::~Window()

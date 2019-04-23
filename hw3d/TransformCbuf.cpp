@@ -10,7 +10,7 @@ void TransformCbuf::Bind( Graphics& gfx ) noexcept
 {
 	vcbuf.Update( gfx,
 		DirectX::XMMatrixTranspose(
-			parent.GetTransformXM() * gfx.GetProjection()
+			parent.GetTransformXM() * gfx.GetView() * gfx.GetProjection()
 		)
 	);
 	vcbuf.Bind( gfx );

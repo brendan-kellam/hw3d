@@ -12,9 +12,14 @@ namespace dx = DirectX;
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"D3DCompiler.lib")
 
-
-Graphics::Graphics( HWND hWnd )
+Graphics::Graphics( HWND hWnd, int width, int height)
+	: curFPS(0),
+	fpsCounter(0)
 {
+
+	windowWidth = width;
+	windowHeight = height;
+
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
@@ -75,8 +80,8 @@ Graphics::Graphics( HWND hWnd )
 	// create depth stensil texture
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth = {};
-	descDepth.Width = 800u;
-	descDepth.Height = 600u;
+	descDepth.Width = (UINT) (windowWidth);
+	descDepth.Height = (UINT) (windowHeight);
 	descDepth.MipLevels = 1u;
 	descDepth.ArraySize = 1u;
 	descDepth.Format = DXGI_FORMAT_D32_FLOAT;
@@ -100,13 +105,19 @@ Graphics::Graphics( HWND hWnd )
 	   
 	// configure viewport
 	D3D11_VIEWPORT vp;
-	vp.Width = 800.0f;
-	vp.Height = 600.0f;
+	vp.Width = static_cast<float>(windowWidth);
+	vp.Height = static_cast<float>(windowHeight);
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
 	pContext->RSSetViewports( 1u,&vp );
+
+	// configure camera
+	camera.SetPosition(0.0f, 0.0f, -10.0f);
+	float aspectRatio = static_cast<float>(windowWidth / static_cast<float>(windowHeight));
+	camera.SetProjectionValues(90.0f, aspectRatio, 1.0f, 1000.0f);
+	fpsTimer.Mark();
 }
 
 void Graphics::EndFrame()
@@ -115,7 +126,7 @@ void Graphics::EndFrame()
 #ifndef NDEBUG
 	infoManager.Set();
 #endif
-	if( FAILED( hr = pSwap->Present( 1u,0u ) ) )
+	if( FAILED( hr = pSwap->Present(VSYNC_ENABLED,0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
@@ -126,6 +137,15 @@ void Graphics::EndFrame()
 			throw GFX_EXCEPT( hr );
 		}
 	}
+
+	fpsCounter++;
+	// 1 second elapsed
+	if (fpsTimer.Peek() > 1.0) {
+		curFPS = fpsCounter;
+		fpsTimer.Mark();
+		fpsCounter = 0;
+	}
+
 }
 
 void Graphics::ClearBuffer( float red,float green,float blue ) noexcept
@@ -140,16 +160,20 @@ void Graphics::DrawIndexed( UINT count ) noexcept(!IS_DEBUG)
 	GFX_THROW_INFO_ONLY( pContext->DrawIndexed( count,0u,0u ) );
 }
 
-void Graphics::SetProjection( DirectX::FXMMATRIX proj ) noexcept
-{
-	projection = proj;
-}
-
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
-	return projection;
+	return camera.GetProjectionMatrix();
 }
 
+DirectX::XMMATRIX Graphics::GetView() const noexcept
+{
+	return camera.GetViewMatrix();
+}
+
+int Graphics::GetFPS() const noexcept
+{
+	return curFPS;
+}
 
 // Graphics exception stuff
 Graphics::HrException::HrException( int line,const char * file,HRESULT hr,std::vector<std::string> infoMsgs ) noexcept

@@ -9,6 +9,8 @@
 #include <DirectXMath.h>
 #include <memory>
 #include <random>
+#include "Camera.h"
+#include "ChiliTimer.h"
 
 class Graphics
 {
@@ -51,17 +53,23 @@ public:
 		std::string reason;
 	};
 public:
-	Graphics( HWND hWnd );
+	Graphics( HWND hWnd, int width, int height);
 	Graphics( const Graphics& ) = delete;
 	Graphics& operator=( const Graphics& ) = delete;
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer( float red,float green,float blue ) noexcept;
 	void DrawIndexed( UINT count ) noexcept(!IS_DEBUG);
-	void SetProjection( DirectX::FXMMATRIX proj ) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
+	DirectX::XMMATRIX GetView() const noexcept;
+	int GetFPS() const noexcept;
+
+	Camera camera;
+
 private:
 	DirectX::XMMATRIX projection;
+	DirectX::XMMATRIX view;
+
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;
 #endif
@@ -70,4 +78,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+
+	ChiliTimer fpsTimer;
+	int fpsCounter;
+	int curFPS;
+
+	int windowWidth, windowHeight;
+
+	const UINT VSYNC_ENABLED = FALSE;
 };
