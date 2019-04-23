@@ -9,6 +9,7 @@ A little DirectX11 3D learner game engine. Getting started with two awesome tuto
 Here are various other sources I have found useful:
 - [Mouse Picking with Ray Casting](http://antongerdelan.net/opengl/raycasting.html) by Anton Gerdelan
 - [OpenGL 3D game series](https://www.youtube.com/watch?v=VS8wlS9hF8E&list=PLRIWtICgwaX0u7Rf9zkZhLoLuZVfUksDP) by ThinMatrix. Not Direct3D, but useful nonetheless.
+- [Learn OpenGL](https://learnopengl.com) by Joey de Vries. Again not Direct3D, but super clear tutorials.
 
 ## Perspective Sources
 
