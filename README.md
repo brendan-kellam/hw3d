@@ -12,6 +12,7 @@ Here are various other sources I have found useful:
 - [Learn OpenGL](https://learnopengl.com) by Joey de Vries. Again not Direct3D, but super clear tutorials.
 - [Raster Tek](http://www.rastertek.com)
 - [3D Game Engine Programming (3dgep)](https://www.3dgep.com) by Jeremiah van Oosten
+- [Nori](https://wjakob.github.io/nori/)
 
 ## Perspective Sources
 
