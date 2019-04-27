@@ -14,7 +14,7 @@ App::App()
 	std::uniform_real_distribution<float> odist( 0.0f, DirectX::XM_PI * 0.3f );
 	std::uniform_real_distribution<float> rdist( 0.0f, DirectX::XM_PI*10);
 	
-	for( auto i = 0; i < 4; i++ )
+	for( auto i = 0; i < 100; i++ )
 	{
 		boxes.push_back( std::make_unique<Box>(
 			wnd.Gfx(),rng,adist,
