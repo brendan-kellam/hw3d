@@ -15,6 +15,7 @@
 class Graphics
 {
 	friend class Bindable;
+	friend class Window;
 public:
 	class Exception : public ChiliException
 	{
@@ -60,6 +61,7 @@ public:
 	void EndFrame();
 	void ClearBuffer( float red,float green,float blue ) noexcept;
 	void DrawIndexed( UINT count ) noexcept(!IS_DEBUG);
+	void Resize(const int width, const int height);
 	DirectX::XMMATRIX GetProjection() const noexcept;
 	DirectX::XMMATRIX GetView() const noexcept;
 	int GetFPS() const noexcept;

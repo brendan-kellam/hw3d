@@ -21,6 +21,7 @@
 #include <sstream>
 #include "resource.h"
 #include "WindowsThrowMacros.h"
+#include "WindowsMessageMap.h"
 
 
 // Window Class Stuff
@@ -80,14 +81,14 @@ Window::Window( int width,int height,const char* name )
 	wr.right = width + wr.left;
 	wr.top = 100;
 	wr.bottom = height + wr.top;
-	if( AdjustWindowRect( &wr,WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,FALSE ) == 0 )
+	if( AdjustWindowRect( &wr,WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPEDWINDOW,FALSE ) == 0 )
 	{
 		throw CHWND_LAST_EXCEPT();
 	}
 	// create window & get hWnd
 	hWnd = CreateWindow(
 		WindowClass::GetName(),name,
-		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,CW_USEDEFAULT,wr.right - wr.left,wr.bottom - wr.top,
 		nullptr,nullptr,WindowClass::GetInstance(),this
 	);
@@ -280,6 +281,24 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 		break;
 	}
 	/************** END MOUSE MESSAGES **************/
+	
+	/************** WINDOW RESIZE MESSAGES **************/
+
+	case WM_SIZE:
+		if (pGfx.get() && pGfx->pSwap)
+		{
+			int height = lParam >> 16;
+			int width = lParam & 0xFFFF;
+
+			if (width > 0 && height > 0)
+			{
+				pGfx->Resize(width, height);
+			}
+
+
+			WindowsMessageMap m;
+			OutputDebugString(m(WM_SIZE, lParam, wParam).c_str());
+		}
 	}
 
 	return DefWindowProc( hWnd,msg,wParam,lParam );

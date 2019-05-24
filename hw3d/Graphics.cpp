@@ -64,8 +64,11 @@ Graphics::Graphics( HWND hWnd, int width, int height)
 	// gain access to texture subresource in swap chain (back buffer)
 	wrl::ComPtr<ID3D11Resource> pBackBuffer;
 	GFX_THROW_INFO( pSwap->GetBuffer( 0,__uuidof(ID3D11Resource),&pBackBuffer ) );
+	
+	// Creates a render-target view for accessing the back buffer
 	GFX_THROW_INFO( pDevice->CreateRenderTargetView( pBackBuffer.Get(),nullptr,&pTarget ) );
 	
+
 	// create depth stensil state
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = TRUE;
@@ -158,6 +161,61 @@ void Graphics::ClearBuffer( float red,float green,float blue ) noexcept
 void Graphics::DrawIndexed( UINT count ) noexcept(!IS_DEBUG)
 {
 	GFX_THROW_INFO_ONLY( pContext->DrawIndexed( count,0u,0u ) );
+}
+
+void Graphics::Resize(const int width, const int height)
+{
+	std::ostringstream s;
+	s << "w: " << width << ", h: " << height << '\n';
+	
+	OutputDebugString(s.str().c_str());
+
+	/* 1. Clear render targets from device context */
+	ID3D11RenderTargetView* nullViews[] = { nullptr };
+	pContext->OMSetRenderTargets(1u, nullptr, nullptr);
+
+	/* 2. Release Rendering Target */
+	pTarget = nullptr;
+	pContext->Flush();
+
+	/* 3. Resize buffer */
+	HRESULT hr;
+	DXGI_SWAP_CHAIN_DESC desc;
+	GFX_THROW_INFO(pSwap->GetDesc(&desc));
+
+	if (FAILED(hr = pSwap->ResizeBuffers(desc.BufferCount, width, height, desc.BufferDesc.Format, 0)))
+	{
+		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+		{
+			throw GFX_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
+		}
+		else
+		{
+			throw GFX_EXCEPT(hr);
+		}
+	}
+
+
+	/* 4. Reset the buffer as target view */
+	wrl::ComPtr<ID3D11Texture2D> pBackBuffer;
+	GFX_THROW_INFO(pSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), &pBackBuffer));
+	GFX_THROW_INFO(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
+	
+	/* 5. Set the new render target */
+	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get());
+
+	/* 6. Reset view port */
+	this->windowWidth = width;
+	this->windowHeight = height;
+
+	D3D11_VIEWPORT vp = { 0 };
+	vp.Width = static_cast<float>(windowWidth);
+	vp.Height = static_cast<float>(windowHeight);
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	vp.TopLeftX = 0.0f;
+	vp.TopLeftY = 0.0f;
+	pContext->RSSetViewports(1u, &vp);
 }
 
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
