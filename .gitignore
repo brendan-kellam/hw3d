@@ -51,6 +51,8 @@ artifacts/
 *.ilk
 *.meta
 *.obj
+!hw3d/Models/*.obj
+!hw3d/assimp/bin/*
 *.pch
 *.pdb
 *.pgc
@@ -260,3 +262,4 @@ paket-files/
 __pycache__/
 *.pyc
 *.cso
+/hw3d/imgui.ini
